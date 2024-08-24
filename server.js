@@ -1,34 +1,24 @@
 const express = require('express');
-
+const connectDB = require('./config/db');
+const logger = require('./logs/logger');
+const carbonRoutes = require('./modules/carbon-emissions/routes');
+const errorHandler = require('./middleware/errorHandler')
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-/**
- * Simple route to check the health of the server.
- */
-app.get('/health', (request, response) => {
-  const healthCheck = {
-    message: 'OK'
-  };
-  response.send(healthCheck);
-});
+(async () => {
+    try {
+        await connectDB();
+        app.use(express.json());
+        app.use('/api', carbonRoutes);
 
-/**
- * Updates the carbon emissions with the latest data from electricitymaps.com.
- */
-app.post('/emissions/update', (request, response) => {
-  response.send({
-    updatedAt: "2024-08-19 16:23"
-  });
-});
+        app.use(errorHandler);
 
-/**
- * Returns the total carbon emissions for the requested date (YYYY-mm-dd).
- * For example, `curl -i http://localhost:3000/emissions/2024-08-19`.
- */
-app.get('/emissions/:date', (request, response) => {
-  response.send({
-    date: request.params.date
-  })
-});
-
-app.listen(3000, () => console.log('Server is listening on port 3000'));
+        app.listen(PORT, () => {
+            logger.info(`Server is running on http://localhost:${PORT}`, {label: 'server.js'});
+        });
+    } catch (err) {
+        logger.error('Failed to connect to MongoDB', { error: err.message });
+        process.exit(1);
+    }
+})();
