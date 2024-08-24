@@ -30,7 +30,7 @@ async function fetchCarbonIntensity(){
 			headers: {'auth_token' : `${process.env.API_TOKEN}`}
 		})
 		if(carbonIntensityResponse.status === 200){
-			const carbonIntensity = powerBreakdownResponse.map(elem => ({
+			const carbonIntensity = carbonIntensityResponse.map(elem => ({
 				datetime: elem.datetime,
 				carbonIntensity: elem.carbonIntensity
 			}));
