@@ -1,4 +1,5 @@
 const axios = require('axios');
+const cron = require('node-cron');
 const { storeHourlyEmissions, getDailyEmissionsFromDB } = require('./dbservice');
 const { fetchPowerConsumption, fetchCarbonIntensity, calculateCarbonEmissions } = require('./service');
 const CarbonEmission = require('./model');
@@ -92,6 +93,8 @@ async function getDailyEmissions(req, res) {
     res.status(500).json({ error: error.message });
 }
 }
+
+cron.schedule('0 * * * *', updateCarbonEmissions);
 
 module.exports = {
   checkHealth,
