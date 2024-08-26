@@ -16,7 +16,7 @@ function calculateCarbonEmissions(consumption, intensity) {
 
 		if(carbonIntensity !== undefined){
 			const powerConsumptionInW = megawattsToWatts(consumptionEntry.powerConsumptionTotal);
-        	const carbonIntensityInWh = carbonIntensityGPerKWhToGPerWh(carbonIntensity);
+        		const carbonIntensityInWh = carbonIntensityGPerKWhToGPerWh(carbonIntensity);
 
 			const carbonEmissionsInGrams = powerConsumptionInW * carbonIntensityInWh;
 
