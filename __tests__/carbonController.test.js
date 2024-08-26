@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { checkHealth, updateCarbonEmissions, getDailyEmissions } = require('../modules/carbon-emissions/controller');
-const { getDailyEmissionsFromDB, storeHourlyEmissions } = require('../modules/carbon-emissions/dbservice');
+const { getDailyEmissionsFromDB } = require('../modules/carbon-emissions/dbservice');
 const { fetchPowerConsumption, fetchCarbonIntensity, calculateCarbonEmissions } = require('../modules/carbon-emissions/service');
 const CarbonEmission = require('../modules/carbon-emissions/model');
 const logger = require('../logs/logger');
@@ -103,7 +103,6 @@ describe('updateCarbonEmissions', () => {
         json: jest.fn(),
       };
   
-      // Reset mocks before each test
       fetchPowerConsumption.mockReset();
       fetchCarbonIntensity.mockReset();
       calculateCarbonEmissions.mockReset();
@@ -115,7 +114,7 @@ describe('updateCarbonEmissions', () => {
     it('should return 204 if no emissions data is available to store', async () => {
         fetchPowerConsumption.mockResolvedValue([{ datetime: '2023-08-26T00:00:00Z', powerConsumptionTotal: 100 }]);
         fetchCarbonIntensity.mockResolvedValue([{ datetime: '2023-08-26T00:00:00Z', carbonIntensity: 50 }]);
-        calculateCarbonEmissions.mockReturnValue([]); // No emissions
+        calculateCarbonEmissions.mockReturnValue([]);
 
         await updateCarbonEmissions(null, res);
 

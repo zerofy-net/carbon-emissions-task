@@ -29,7 +29,6 @@ describe('calculateCarbonEmissions', () => {
         ];
         const intensity = [
             { datetime: '2024-08-24T00:00:00Z', carbonIntensity: 300 },
-            // Missing intensity for the second timestamp
         ];
 
         const result = calculateCarbonEmissions(consumption, intensity);

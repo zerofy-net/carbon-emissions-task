@@ -40,10 +40,7 @@ describe('storeHourlyEmissions', () => {
             { datetime: '2024-08-24T01:00:00Z', carbonEmission: 4000 },
         ];
 
-        // Mocking existing records (none found)
         CarbonEmission.findOne.mockResolvedValue(null);
-
-        // Mocking bulkWrite operation
         CarbonEmission.bulkWrite.mockResolvedValue({});
 
         await storeHourlyEmissions(emissions);
@@ -73,7 +70,6 @@ describe('storeHourlyEmissions', () => {
             { datetime: '2024-08-24T00:00:00Z', carbonEmission: 3000 },
         ];
 
-        // Mocking existing records (identical emission found)
         CarbonEmission.findOne.mockResolvedValue({ carbonEmission: 3000 });
 
         await storeHourlyEmissions(emissions);
@@ -87,7 +83,6 @@ describe('storeHourlyEmissions', () => {
             { datetime: '2024-08-24T00:00:00Z', carbonEmission: 3000 },
         ];
 
-        // Mocking database query failure
         CarbonEmission.findOne.mockRejectedValue(new Error('Database error'));
 
         await expect(storeHourlyEmissions(emissions)).rejects.toThrow('Database query failed');
@@ -99,10 +94,8 @@ describe('storeHourlyEmissions', () => {
             { datetime: '2024-08-24T00:00:00Z', carbonEmission: 3000 },
         ];
 
-        // Mocking existing records (none found)
         CarbonEmission.findOne.mockResolvedValue(null);
 
-        // Mocking bulkWrite failure
         CarbonEmission.bulkWrite.mockRejectedValue(new Error('Bulk write error'));
 
         await expect(storeHourlyEmissions(emissions)).rejects.toThrow('Bulk write operation failed');
