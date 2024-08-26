@@ -41,7 +41,6 @@ async function fetchPowerConsumption(){
 			headers: {'auth_token' : `${process.env.API_TOKEN}`}
 		})
 		if(powerBreakdownResponse.status === 200){
-			console.log('Helllllo');
 			const powerBreakdownData = powerBreakdownResponse.data.history;
 			const powerConsumption = powerBreakdownData.map(elem => ({
 				datetime: elem.datetime,

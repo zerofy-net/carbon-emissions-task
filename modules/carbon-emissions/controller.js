@@ -1,3 +1,4 @@
+const axios = require('axios');
 const { storeHourlyEmissions } = require('./dbservice');
 const { fetchPowerConsumption, fetchCarbonIntensity, calculateCarbonEmissions } = require('./service');
 const CarbonEmission = require('./model');
@@ -5,6 +6,36 @@ const logger = require('../../logs/logger');
 const { format } = require('date-fns');
 
 async function checkHealth(req, res) {
+  try {
+      logger.info('Starting health check for Electricity Maps API');
+      const response = await axios.get(process.env.API_URL + 'health');
+
+      logger.info('Electricity Maps API health check succeeded', {
+          apiStatus: response.data.status,
+          apiMonitors: response.data.monitors,
+        });
+
+      const healthCheck = {
+          serverStatus: 'OK',
+          apiStatus: response.data.status || 'Unknown',
+          apiMonitors: response.data.monitors || {},
+      };
+
+      res.status(200).send(healthCheck);
+  } catch (error) {
+      logger.error('Error checking Electricity Maps API health', {
+          message: error.message,
+          stack: error.stack,
+      });
+
+      const healthCheck = {
+          serverStatus: 'OK',
+          apiStatus: 'Unavailable',
+          errorMessage: error.message,
+      };
+
+      res.status(500).json(healthCheck);
+  }
 }
 
 async function updateCarbonEmissions(req = null, res = null) {
