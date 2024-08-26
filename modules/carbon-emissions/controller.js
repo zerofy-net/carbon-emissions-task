@@ -1,9 +1,9 @@
 const axios = require('axios');
-const { storeHourlyEmissions } = require('./dbservice');
+const { storeHourlyEmissions, getDailyEmissionsFromDB } = require('./dbservice');
 const { fetchPowerConsumption, fetchCarbonIntensity, calculateCarbonEmissions } = require('./service');
 const CarbonEmission = require('./model');
 const logger = require('../../logs/logger');
-const { format } = require('date-fns');
+const { format, isValid, parseISO } = require('date-fns');
 
 async function checkHealth(req, res) {
   try {
@@ -70,11 +70,31 @@ async function updateCarbonEmissions(req = null, res = null) {
   }
 }
 
-async function getHourlyEmissions(req, res) {
+async function getDailyEmissions(req, res) {
+  try {
+    const { date } = req.params;
+
+    const parsedDate = parseISO(date);
+    if (!isValid(parsedDate) || date.length !== 10) {
+        return res.status(400).json({ message: 'Invalid date format. Use YYYY-MM-DD.' });
+    }
+
+    const hourlyEmissions = await getDailyEmissionsFromDB(date);
+
+    const totalEmissionsPerDay = hourlyEmissions.reduce((acc, emission) => acc + (emission || 0), 0);
+
+    res.status(200).json({
+        date,
+        totalEmissionsPerDay,
+        hourlyEmissions,
+    });
+} catch (error) {
+    res.status(500).json({ error: error.message });
+}
 }
 
 module.exports = {
   checkHealth,
   updateCarbonEmissions,
-  getHourlyEmissions,
+  getDailyEmissions,
 };
