@@ -1,5 +1,6 @@
 const axios = require("axios");
 const logger = require('../../logs/logger');
+const { megawattsToWatts, carbonIntensityGPerKWhToGPerWh } = require('../../utils/conversions');
 
 function calculateCarbonEmissions(consumption, intensity) {
 	if(!Array.isArray(consumption) || !Array.isArray(intensity)){
@@ -14,9 +15,8 @@ function calculateCarbonEmissions(consumption, intensity) {
 		const carbonIntensity = intensityMap[consumptionEntry.datetime];
 
 		if(carbonIntensity !== undefined){
-			const powerConsumptionInW = consumptionEntry.powerConsumptionTotal * 1000000;
-
-			const carbonIntensityInWh = carbonIntensity * 0.001;
+			const powerConsumptionInW = megawattsToWatts(consumptionEntry.powerConsumptionTotal);
+        	const carbonIntensityInWh = carbonIntensityGPerKWhToGPerWh(carbonIntensity);
 
 			const carbonEmissionsInGrams = powerConsumptionInW * carbonIntensityInWh;
 
