@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
         app.use(errorHandler);
 
         app.listen(PORT, () => {
-            logger.info(`Server is running on http://localhost:${PORT}`, {label: 'server.js'});
+            logger.info(`Server is running on http://localhost:${PORT}`);
         });
     } catch (err) {
         logger.error('Failed to connect to MongoDB', { error: err.message });

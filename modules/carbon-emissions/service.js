@@ -1,6 +1,37 @@
 const axios = require("axios");
+const logger = require('../../logs/logger');
 
 function calculateCarbonEmissions(consumption, intensity) {
+	if(!Array.isArray(consumption) || !Array.isArray(intensity)){
+		throw new Error('Invalid input: Consumption and carbon intensity data should be arrays')
+	};
+	const intensityMap = intensity.reduce((acc, curr) => {
+		acc[curr.datetime] = curr.carbonIntensity;
+		return acc;
+	}, {});
+
+	const emissions = consumption.map(consumptionEntry => {
+		const carbonIntensity = intensityMap[consumptionEntry.datetime];
+
+		if(carbonIntensity !== undefined){
+			const powerConsumptionInW = consumptionEntry.powerConsumptionTotal * 1000000;
+
+			const carbonIntensityInWh = carbonIntensity * 0.001;
+
+			const carbonEmissionsInGrams = powerConsumptionInW * carbonIntensityInWh;
+
+			return {
+				datetime: consumptionEntry.datetime,
+				carbonEmission: carbonEmissionsInGrams
+			};
+		} else {
+			return {
+				datetime: consumptionEntry.datetime,
+				carbonEmission: null
+			};
+		}
+	});
+
 	return emissions;
 }
 
@@ -10,7 +41,9 @@ async function fetchPowerConsumption(){
 			headers: {'auth_token' : `${process.env.API_TOKEN}`}
 		})
 		if(powerBreakdownResponse.status === 200){
-			const powerConsumption = powerBreakdownResponse.map(elem => ({
+			console.log('Helllllo');
+			const powerBreakdownData = powerBreakdownResponse.data.history;
+			const powerConsumption = powerBreakdownData.map(elem => ({
 				datetime: elem.datetime,
 				powerConsumptionTotal: elem.powerConsumptionTotal
 			}));
@@ -30,7 +63,8 @@ async function fetchCarbonIntensity(){
 			headers: {'auth_token' : `${process.env.API_TOKEN}`}
 		})
 		if(carbonIntensityResponse.status === 200){
-			const carbonIntensity = carbonIntensityResponse.map(elem => ({
+			const carbonIntensityData = carbonIntensityResponse.data.history;
+			const carbonIntensity = carbonIntensityData.map(elem => ({
 				datetime: elem.datetime,
 				carbonIntensity: elem.carbonIntensity
 			}));
