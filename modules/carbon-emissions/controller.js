@@ -9,7 +9,7 @@ const { format, isValid, parseISO } = require('date-fns');
 async function checkHealth(req, res) {
   try {
       logger.info('Starting health check for Electricity Maps API');
-      const response = await axios.get(process.env.API_URL + 'health');
+      const response = await axios.get('https://api.electricitymap.org/health');
 
       logger.info('Electricity Maps API health check succeeded', {
           apiStatus: response.data.status,

@@ -14,7 +14,7 @@ async function storeHourlyEmissions(emissions) {
                 newEmissions.push(emission);
             }
         } catch(error) {
-            logger.error('Error querying the database:', { error: err.message });
+            logger.error('Error querying the database:', { error: error.message });
             throw new Error('Database query failed');
         }
     }
