@@ -15,9 +15,10 @@ route.get("/", async (request, response) => {
             database: await checkMongoDBConnection(),
             externalAPI: await checkElectricityMapsAPI(),
         };
-
         return response.status(200).send(healthCheck);
-    } catch (error) {}
+    } catch (error) {
+        return response.status(500).send("Health check failed!");
+    }
 });
 
 export default route;
